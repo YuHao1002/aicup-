@@ -1,0 +1,73 @@
+import torch
+from tqdm import tqdm#, tqdm_notebook
+from torch.nn import functional as F
+from transformers import get_linear_schedule_with_warmup
+from torch.optim import AdamW
+from tqdm import tqdm,trange
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def sample_text(model, tokenizer, seed, n_words=20):
+    model = model.to(device)
+    model.eval()
+    text = tokenizer.encode(seed)
+    inputs, past_key_values = torch.tensor([text]), None
+    with torch.no_grad():
+        for _ in tqdm(range(n_words)):
+            out = model(inputs.to(device), past_key_values=past_key_values)
+            logits = out.logits
+            past_key_values = out.past_key_values
+            log_probs = F.softmax(logits[:, -1], dim=-1)
+            inputs = torch.multinomial(log_probs, 1)
+            text.append(inputs.item())
+            if tokenizer.decode(inputs.item()) == eos:
+                break
+    return tokenizer.decode(text)
+sample_text(model, tokenizer, seed=f"{bos} DR AADLAND ABRAHAM {sep}")
+
+  
+EPOCHS = 2 # 設定你的訓練次數
+optimizer = AdamW(model.parameters(),lr=5e-5)
+
+steps = len(bucket_train_dataloader)
+total_steps = steps * EPOCHS
+print(steps, total_steps)
+
+scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=total_steps*0.1,
+    num_training_steps=total_steps
+)
+
+model.resize_token_embeddings(len(tokenizer))
+model.to(device)
+print(f'Total numbers of steps: {total_steps}')
+model
+
+
+
+global_step = 0
+total_loss = 0
+
+model.train()
+for _ in trange(EPOCHS, desc="Epoch"):
+    model.train()
+    total_loss = 0
+
+    predictions , true_labels = [], []
+
+    for step, (seqs, labels, masks) in enumerate(bucket_train_dataloader):
+        seqs = seqs.to(device)
+        labels = labels.to(device)
+        masks = masks.to(device)
+        model.zero_grad()
+        outputs = model(seqs, labels=labels)#, attention_mask=masks)
+        logits = outputs.logits
+        loss = outputs.loss
+        loss = loss.mean()
+        total_loss += loss.item()
+        loss.backward()
+        optimizer.step()
+        scheduler.step()  # Update learning rate schedule
+    avg_train_loss = total_loss / len(bucket_train_dataloader)
+    print("Average train loss: {}".format(avg_train_loss))
