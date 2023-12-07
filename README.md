@@ -68,6 +68,7 @@ https://huggingface.co/docs/datasets/index
 
 ### 使用到的框架
 
+- [EleutherAI/pythia-160m-deduped](https://huggingface.co/EleutherAI/pythia-160m-deduped)
 - [transformers](https://claire-chang.com/2023/09/26/transformer-%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%B4%B9/)
 - [datasets](https://huggingface.co/docs/datasets/index)
 - [torch](https://pytorch.org/)
