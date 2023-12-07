@@ -98,8 +98,8 @@ https://huggingface.co/docs/datasets/index
 
 ### 使用到的框架
 
-- [transformers]([https://getbootstrap.com](https://claire-chang.com/2023/09/26/transformer-%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%B4%B9/))
-- [datasets]([https://jquery.com](https://huggingface.co/docs/datasets/index))
+- [transformers](https://claire-chang.com/2023/09/26/transformer-%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%B4%B9/)
+- [datasets](https://huggingface.co/docs/datasets/index)
 - [xxxxxxx](https://laravel.com)
 - transformers：用於自然語言處理的函式庫
 (2)	datasets：提供方便的資料集載入、處理功能的函式庫
