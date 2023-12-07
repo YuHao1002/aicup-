@@ -64,7 +64,7 @@ eg:
 
 ```
 filetree 
-├── ARCHITECTURE.md
+├── README.md
 ├── LICENSE.txt
 ├── README.md
 ├── /account/
