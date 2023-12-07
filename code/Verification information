@@ -1,0 +1,88 @@
+from datasets import load_dataset, Features, Value
+valid_data = load_dataset("csv", data_files="opendid_valid.tsv", delimiter='\t',
+                          features = Features({
+                              'fid': Value('string'), 'idx': Value('int64'),
+                              'content': Value('string'), 'label': Value('string')}),
+                              column_names=['fid', 'idx', 'content', 'label'])
+valid_list= list(valid_data['train'])
+valid_list
+
+import re
+from tqdm import tqdm#, tqdm_notebook
+import torch
+
+tokenizer.padding_side = 'left'
+def sample_batch(model, tokenizer, input):
+    """Generate text from a trained model."""
+    model.eval()
+    seeds = [f"{bos} {text['content']} {sep}" for text in input]
+    texts = tokenizer(seeds, return_tensors = 'pt', padding=True).to(device)
+    outputs = []
+    #return
+    with torch.cuda.amp.autocast():
+        output_tokens = model.generate(**texts, max_new_tokens=400, pad_token_id = PAD_IDX,
+                                        eos_token_id=tokenizer.convert_tokens_to_ids(eos))
+        preds = tokenizer.batch_decode(output_tokens)
+        for idx , pred in enumerate(preds):
+            pred = pred[pred.index(sep)+len(sep):].replace(pad, "").replace(eos, "").strip()
+            if pred == "PHI: NULL":
+                continue
+            phis = pred.split('\n')
+            lidxs = {}
+            for p in phis:
+                tid = p.find(':')
+                if tid > 0:
+                    text = p[tid+1:].strip()
+                    nv = text.find('=>')
+                    normalizedV = None
+                    # 處理時間正規化
+                    # YOU IMPLEMENTATION
+                    if nv > 0:
+                      normalizedV = text[nv+2:]
+                      text = text[:nv]
+
+                      # ILEN (DATE)
+                    else:
+                      match_date = re.match(r'(\d{1,2})/(\d{1,2})/(\d{2,4})', text)  # 匹配日期的正則表達式
+                      if match_date:
+                          day, month, year = map(int, match_date.groups())
+                          if len(str(year)) == 2:  # 如果年份只有兩位數
+                              year += 2000  # 假設年份在 100 以內，將其轉換為四位數年份格式
+                          normalizedV = f"{year:04d}-{month:02d}-{day:02d}"
+                      else:
+                          match_time = re.match(r'(\d{1,2}:\d{2}(?:am|pm)) on (\d{1,2}/\d{1,2}/\d{2,4})', text)
+                          if match_time:
+                              time, date_text = match_time.groups()
+                              day, month, year = map(int, date_text.split('/'))
+                              normalizedV = f"{year:04d}-{month:02d}-{day:02d}T{time}"
+
+                    lidx = 0
+                    if text in lidxs:
+                        lidx = lidxs[text]
+                    lidx = input[idx]['content'].find(text, lidx)
+                    eidx = lidx+len(text)
+
+                    lidxs[text] = eidx
+                    sidx=int(input[idx]['idx'])
+
+                    if lidx != eidx:
+
+                      if normalizedV is None:
+                        if text == 'P.O. BOX 246' or text == 'PO BOX 224' or text == 'PO BOX 1322' or text == 'PO BOX 1000':
+                            outputs.append(f'{input[idx]["fid"]}\tLOCATION-OTHER\t{lidx + sidx}\t{eidx + sidx}\t{text}')
+                        else:
+                          outputs.append(f'{input[idx]["fid"]}\t{p[:tid]}\t{lidx+sidx}\t{eidx+sidx}\t{text}')
+                      else:
+                          outputs.append(f'{input[idx]["fid"]}\t{p[:tid]}\t{lidx+sidx}\t{eidx+sidx}\t{text}\t{normalizedV}')
+    return outputs
+
+f = open("answer.txt", "w", encoding="utf-8")
+BATCH_SIZE = 8
+for i in tqdm(range(0, len(valid_list), BATCH_SIZE)):
+    with torch.no_grad():
+        seeds = valid_list[i:i+BATCH_SIZE]
+        outputs = sample_batch(model, tokenizer, input=seeds)
+        for o in outputs:
+            f.write(o)
+            f.write('\n')
+f.close()
