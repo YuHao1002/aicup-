@@ -1,0 +1,76 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+from datasets import load_dataset, Features, Value
+dataset = load_dataset("csv", data_files="All13.tsv", delimiter='\t',
+                       features = Features({
+                              'fid': Value('string'), 'idx': Value('int64'),
+                              'content': Value('string'), 'label': Value('string')}),
+                       column_names=['fid', 'idx', 'content', 'label'], keep_default_na=False)
+
+import torch
+sub_datasets = torch.utils.data.random_split(dataset['train'], [ 164495 , 0 ])
+print(len(sub_datasets[0]))
+for i in range(4): print(sub_datasets[0][i])
+PAD_IDX = tokenizer.convert_tokens_to_ids(tokenizer.pad_token)
+IGNORED_PAD_IDX = -100
+PAD_IDX
+
+from torch.utils.data import DataLoader
+import torch
+
+train_data = list(sub_datasets[0])
+
+def collate_batch(batch):
+    texts = [f"{bos} {data['content']} {sep}"+ data['label'].replace('\\n','\n')+f" {eos}" for data in list(batch)] # 範例 prompt
+    encoded_seq = tokenizer(texts, padding=True)
+
+    indexed_tks = torch.tensor(encoded_seq['input_ids'])
+    attention_mask = torch.tensor(encoded_seq['attention_mask'])
+    encoded_label = torch.tensor(encoded_seq['input_ids'])
+    encoded_label[encoded_label == tokenizer.pad_token_id] = IGNORED_PAD_IDX
+
+    return indexed_tks, encoded_label, attention_mask
+
+train_dataloader = DataLoader(train_data, batch_size=2, shuffle=False, collate_fn=collate_batch)
+titer = iter(train_dataloader)
+tks, labels, masks= next(titer)
+print(tks.shape)
+next(iter(titer))
+import random
+BATCH_SIZE = 4 # 自行決定大小
+
+class BatchSampler():
+    def __init__(self, data, batch_size):
+        self.pooled_indices = []
+        self.data = data
+        self.batch_size = batch_size
+        self.len = len(list(data))
+    def __iter__(self):
+        self.pooled_indices = []
+        indices = [(index, len(data["content"])) for index, data in enumerate(self.data)]
+        random.shuffle(indices)
+        for i in range(0, len(indices), BATCH_SIZE * 100):
+            self.pooled_indices.extend(sorted(indices[i:i + BATCH_SIZE * 100], key=lambda x: x[1], reverse=True))
+        self.pooled_indices = [x[0] for x in self.pooled_indices]
+
+        for i in range(0, len(self.pooled_indices), BATCH_SIZE):
+            yield self.pooled_indices[i:i + BATCH_SIZE]
+    def __len__(self):
+        return (self.len + self.batch_size - 1) // self.batch_size
+
+bucket_train_dataloader = DataLoader(train_data, batch_sampler=BatchSampler(train_data, BATCH_SIZE),
+                                     collate_fn=collate_batch, pin_memory=True)
+
+from transformers import AutoConfig
+config = AutoConfig.from_pretrained(plm,
+                                    bos_token_id=tokenizer.bos_token_id,
+                                    eos_token_id=tokenizer.eos_token_id,
+                                    pad_token_id=tokenizer.pad_token_id,
+                                    sep_token_id=tokenizer.sep_token_id,
+                                    output_hidden_states=False)
+
+model = AutoModelForCausalLM.from_pretrained(plm, revision="step3000", config=config)
+model
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
