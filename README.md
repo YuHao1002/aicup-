@@ -112,7 +112,9 @@ https://huggingface.co/docs/datasets/index
 
 ### 作者
 
-xxx@xxxx
+yuhao910826@gmail.com <br>
+C110154226@nkust.edu.tw <br>
+
 
  *您也可以在貢獻者名單中參看所有參與該專案的開發者。*
 
