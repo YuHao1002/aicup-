@@ -1,0 +1,17 @@
+tsv_file_path_1 = 'C:/Users/yuhao/Desktop/txt/opendid_set1.tsv' #File location of opendid_set1.tsv
+tsv_file_path_2 = 'C:/Users/yuhao/Desktop/txt/opendid_set2.tsv' #File location of opendid_set2.tsv
+merged_tsv_path = 'C:/Users/yuhao/Desktop/txt/new.tsv'  #File location of new.tsv
+
+with open(tsv_file_path_1, 'r', encoding='utf-8') as file1:
+    content1 = file1.readlines()
+
+with open(tsv_file_path_2, 'r', encoding='utf-8') as file2:
+    content2 = file2.readlines()
+
+
+merged_content = content1 + content2
+
+with open(merged_tsv_path, 'w', encoding='utf-8') as merged_file:
+    merged_file.writelines(merged_content)
+
+print(f"已將 {tsv_file_path_1} 與 {tsv_file_path_2} 合併成 {merged_tsv_path}")
