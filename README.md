@@ -100,16 +100,11 @@ https://huggingface.co/docs/datasets/index
 
 - [transformers](https://claire-chang.com/2023/09/26/transformer-%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%B4%B9/)
 - [datasets](https://huggingface.co/docs/datasets/index)
-- [xxxxxxx](https://laravel.com)
-- transformers：用於自然語言處理的函式庫
-(2)	datasets：提供方便的資料集載入、處理功能的函式庫
-(3)	torch：PyTorch深度學習框架
-(4)	tqdm：用於在迭代過程中顯示進度條
-(5)	pandas：用於資料處理和分析的函式庫
-(6)	numpy：用於數值計算和數據處理的函式庫
-(7)	re： Python 的正規化表達函式庫。
-
-
+- [torch](https://pytorch.org/)
+- [tqdm](https://clay-atlas.com/blog/2019/11/11/python-chinese-tutorial-tqdm-progress-and-ourself/)
+- [pandas](https://pandas.pydata.org/)
+- [numpy](https://numpy.org/)
+- [re](https://docs.python.org/zh-tw/3/howto/regex.html)
 
 ### 版本控制
 
