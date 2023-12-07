@@ -52,8 +52,13 @@ Description
 
 ###### **安裝步驟**
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Load the Merge tsv files.py file
+2. Load the Load pro-trained model.py file
+3. Load the Load data.py file
+4. Load the training program.py file
+5. Load the Verification information.py file
+6. Load the after-treatment.py file
+
 
 ```sh
 git clone https://github.com/your_github_name/your_repository.git
