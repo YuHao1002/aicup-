@@ -69,20 +69,11 @@ filetree
 │  ├── Merge tsv files.py
 │  ├── Load pro-trained model.py
 │  ├── Load data.py
-│  ├── Load data.py
-│  ├── Load data.py
-│  ├── Load data.py
-
-
-├── 
-│  │  └── frontend.txt
-├── manage.py
-├── /oa/
-├── /static/
-├── /templates/
-├── useless.md
-└── /util/
-
+│  ├── training program.py
+│  ├── Verification information.py
+│  ├── after-treatment.py
+│  │  └── answer0.txt
+└── 
 ```
 
 
