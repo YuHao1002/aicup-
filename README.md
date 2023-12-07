@@ -83,6 +83,9 @@ filetree
 ### 開發的架構 
 
 請閱讀……
+https://huggingface.co/EleutherAI/pythia-160m-deduped
+https://huggingface.co/docs/datasets/index
+
 
 ### 部署
 
