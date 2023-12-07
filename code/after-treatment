@@ -1,0 +1,37 @@
+def process_data(input_file, output_file):
+    with open(input_file, 'r', encoding="utf-8") as file_x, open(output_file, "w", encoding="utf-8") as file_y:
+        previous_data = set()
+        for line in file_x:
+            line = line.strip()  # 移除開頭/結尾的空格或換行符號
+            data_identifier = '\t'.join(line.split('\t')[:5])
+            # 如果資料已存在，則跳過這行
+            if data_identifier in previous_data:
+                continue
+            # 如果資料不存在，則寫入
+            file_y.write(line + '\n')  # 在每一行後加入換行符號
+            # 更新現有資料
+            previous_data.add(data_identifier)
+
+import pandas as pd
+import numpy as np
+
+# 讀取資料到 DataFrame 中
+ipdata = pd.read_csv("answer.txt", sep='\t', header=None, names=['file_name', 'label', 'start', 'end', 'content', 'nomal'])
+ipdata = ipdata.fillna("NULL")
+
+# 定義 PHI 集合
+PHI = frozenset(["PATIENT", "DOCTOR", "USERNAME", "PROFESSION", "ROOM", "DEPARTMENT", "HOSPITAL", "ORGANIZATION", "STREET", "CITY", "STATE",
+                 "COUNTRY", "ZIP", "LOCATION-OTHER", "AGE", "DATE", "TIME", "DURATION", "SET", "PHONE", "FAX", "EMAIL", "URL", "IPADDR", "SSN",
+                 "MEDICALRECORD", "HEALTHPLAN", "ACCOUNT", "LICENSE", "VECHICLE", "DEVICE", "BIOID", "IDNUM", "OTHER"])
+for i in range(len(ipdata)):
+    if (ipdata.loc[i]["content"] == "NULL"):
+        ipdata=ipdata.drop(i)
+    elif (ipdata.loc[i]["label"] not in PHI):
+        ipdata=ipdata.drop(i)
+
+ipdata.replace('NULL', np.nan, inplace=True)
+ipdata.to_csv("test.tsv", sep='\t', index=False, header=False)
+x = 'test.tsv'
+y = 'answer0.txt'
+process_data(x,y)
+
