@@ -17,8 +17,7 @@
 
 ###### 開發前的配置要求
 
-1. xxxxx x.x.x
-2. xxxxx x.x.x
+python environment
 
 ###### **安裝步驟**
 
