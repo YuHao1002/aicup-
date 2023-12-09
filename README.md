@@ -22,12 +22,14 @@
 
 ###### **安裝步驟**
 
-1. Load the Merge tsv files.py file
-2. Load the Load pro-trained model.py file
-3. Load the Load data.py file
-4. Load the training program.py file
-5. Load the Verification information.py file
-6. Load the after-treatment.py file
+1. Download the data set into your program editor
+2. Load the Merge tsv files.py file
+3. Load the Load pro-trained model.py file
+4. Load the Load data.py file
+5. Load the training program.py file
+6. Load the Verification information.py file
+7. Load the after-treatment.py file
+8. Get answer0.txt file
 
 
 ```sh
@@ -40,6 +42,10 @@ eg:
 ```
 filetree 
 ├── README.md
+├── data set
+│  ├── opendid_set1.tsv
+│  ├── opendid_set2.tsv
+│  └── opendid_valid.tsv
 ├── code
 │  ├── Merge tsv files.py
 │  ├── Load pro-trained model.py
